@@ -5,3 +5,4 @@ services:
     build: .
     volumes:
       - ./dist:/work/dist
+      - ./cica.py:/work/cica.py

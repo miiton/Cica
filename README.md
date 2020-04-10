@@ -138,6 +138,38 @@ fontforge 20120731
 libfontforge 20120731-ML
 ```
 
+### ビルドオプション
+
+ビルド時にオプションまたは環境変数で、一部の文字の設定を変更できます。
+
+Dockerを使う場合の例:
+
+```sh
+docker-compose build; docker-compose run --rm -e CICA_SPACE=1 cica
+```
+
+手動でやる場合の例:
+
+```sh
+fontforge -lang=py -script cica.py --space 1
+```
+
+各オプションは以下のとおりです。
+
+| オプション | 環境変数 | 意味 |
+| --- | --- | --- |
+| --space | CICA_SPACE | 全角スペースに枠をつける (0) かつけない (1) か選べます (デフォルト: 0) |
+| --zero | CICA_ZERO | ゼロを dotted(0)、slashed(1)、Hack(2)、blanked(3) から選べます (デフォルト: 0) |
+| --asterisk | CICA_ASTERISK | アスタリスクのタイプを radial(0) か star(1) か選べます (デフォルト: 0) |
+| --stroked-d | CICA_STROKED_D | Dを stroked(0) か normal(1) か選べます (デフォルト: 0) |
+| --vertical-line | CICA_VERTICAL_LINE | 縦線を broken(0) か solid(1) か選べます (デフォルト: 0) |
+| --ambiguous-width | CICA_AMBIGUOUS_WIDTH | 曖昧幅文字幅を single(0) か wide(1) か選べます (デフォルト: 0) |
+| --ellipsis | CICA_ELLIPSIS | 三点リーダー類を single(0) か wide(1) か選べます (デフォルト: 0) |
+| --emoji | CICA_EMOJI | 絵文字類を noto emoji(0) か system(1) か選べます (デフォルト: 0) |
+| --m | CICA_MODIFIED_LOWERCASE_M | mの中心の線が short(0) か Hack(1) か選べます (デフォルト: 0) |
+| --WM | CICA_MODIFIED_WM | MとWが modified(0) か Hack(1) か選べます (デフォルト: 0) |
+| --broken-emdash | CICA_BROKEN_EMDASH | emdashを broken(0) にするか Hack(1) か選べます (デフォルト: 0) |
+
 ## ライセンス
 
 * [LICENSE.txt](LICENSE.txt)
