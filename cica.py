@@ -21,7 +21,7 @@ TYPO_DESCENT = -104
 TYPO_LINEGAP = 0
 HHEA_ASCENT = 855
 HHEA_DESCENT = -169
-SOURCE = './source'
+SOURCE = os.getenv('CICA_SOURCE_FONTS_PATH', './sourceFonts')
 LICENSE = open('./LICENSE.txt').read()
 COPYRIGHT = open('./COPYRIGHT.txt').read()
 VERSION = '6.0.0-beta'
@@ -44,6 +44,57 @@ ignoring_center.extend([
     0x3018, 0x3019, 0x301a, 0x301b, 0x301d, 0x301e, 0x3099, 0x309a,
     0x309b, 0x309c,
 ])
+
+def remove_glyph_from_hack(_font):
+    """Rounded Mgen+を採用したいグリフをHackから削除
+    """
+    glyphs = [
+            0x2026, # …
+            ]
+
+    for g in glyphs:
+        _font.selection.select(g)
+        _font.clear()
+
+    return _font
+
+def fix_overflow(glyph):
+    """上がASCENTを超えている、または下が-DESCENTを超えているグリフを
+    1024x1024の枠にはまるように修正する
+    ※全角のグリフのみに実施する
+    """
+    if glyph.width < 1024:
+        return glyph
+    if glyph.isWorthOutputting:
+        bb = glyph.boundingBox()
+        height = bb[3] - bb[1]
+        if height > 1024:
+            # resize
+            scale = 1024 / height
+            glyph.transform(psMat.scale(scale, scale))
+        bb = glyph.boundingBox()
+        bottom = bb[1]
+        top = bb[3]
+        if bottom < -DESCENT:
+            glyph.transform(psMat.translate(0, -DESCENT - bottom))
+        elif top > ASCENT:
+            glyph.transform(psMat.translate(0, ASCENT - top))
+    return glyph
+
+
+def check_files():
+    err = 0
+    for f in fonts:
+        if not os.path.isfile(os.path.join(SOURCE, f.get('hack'))):
+            log('%s not exists.' % f)
+            err = 1
+
+        if not os.path.isfile(os.path.join(SOURCE, f.get('mgen_plus'))):
+            log('%s not exists.' % f)
+            err = 1
+    if err > 0:
+        sys.exit(err)
+
 
 def align_to_center(_g):
     """グリフを中央寄せにする
@@ -79,29 +130,6 @@ def align_to_right(_g):
     left = width - (bb[2] - bb[0])
     _g.left_side_bearing = left
     _g.width = width
-
-def fix_overflow(glyph):
-    """上がASCENTを超えている、または下が-DESCENTを超えているグリフを
-    1024x1024の枠にはまるように修正する
-    ※全角のグリフのみに実施する
-    """
-    if glyph.width < 1024:
-        return glyph
-    if glyph.isWorthOutputting:
-        bb = glyph.boundingBox()
-        height = bb[3] - bb[1]
-        if height > 1024:
-            # resize
-            scale = 1024 / height
-            glyph.transform(psMat.scale(scale, scale))
-        bb = glyph.boundingBox()
-        bottom = bb[1]
-        top = bb[3]
-        if bottom < -DESCENT:
-            glyph.transform(psMat.translate(0, -DESCENT - bottom))
-        elif top > ASCENT:
-            glyph.transform(psMat.translate(0, ASCENT - top))
-    return glyph
 
 def modify_nerd(_g):
     """nerdfontの大きさと位置をCica用に調整
@@ -215,7 +243,6 @@ def modify_iconsfordevs(_g):
     align_to_center(_g)
     return _g
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "-s",
@@ -306,11 +333,11 @@ class Cica:
         self.weight = weight
         self.weight_name = weight_name
         self.style_name = style_name
-        self.font_en = fontforge.open('./source/%s' % font_en)
-        self.font_jp = fontforge.open('./source/%s' % font_jp)
+        self.font_en = fontforge.open(os.path.join(SOURCE, font_en))
+        self.font_jp = fontforge.open(os.path.join(SOURCE, font_jp))
         self.italic = italic
-        self.nerd = fontforge.open('./source/nerd.sfd')
-        self.icons_for_devs = fontforge.open('./source/iconsfordevs.ttf')
+        self.nerd = fontforge.open(os.path.join(SOURCE, 'nerd.sfd'))
+        self.icons_for_devs = fontforge.open(os.path.join(SOURCE, 'iconsfordevs.ttf'))
         self.wp = width_parser.WidthParser()
 
     def set_os2_values(self):
@@ -349,14 +376,13 @@ class Cica:
         self.font_jp.hhea_linegap = 0
         self.font_jp.os2_panose = (2, 11, int(weight / 100), 9, 2, 2, 3, 2, 2, 7)
 
-
     def add_dejavu(self):
         dejavu = None
         weight_name = self.weight_name
         if weight_name == "Regular":
-            dejavu = fontforge.open('./source/DejaVuSansMono.ttf')
+            dejavu = fontforge.open(os.path.join(SOURCE, 'DejaVuSansMono.ttf'))
         elif weight_name == "Bold":
-            dejavu = fontforge.open('./source/DejaVuSansMono-Bold.ttf')
+            dejavu = fontforge.open(os.path.join(SOURCE, 'DejaVuSansMono-Bold.ttf'))
 
         for g in dejavu.glyphs():
             g.transform(psMat.compose(psMat.scale(0.45, 0.45), psMat.translate(-21, 0)))
@@ -553,19 +579,6 @@ class Cica:
             elif g.encoding in right:
                 align_to_right(g)
 
-    def reiwa(self, _weight):
-        reiwa = fontforge.open('./sourceFonts/reiwa.sfd')
-        if _weight == 'Bold':
-            reiwa.close()
-            reiwa = fontforge.open('./sourceFonts/reiwa-Bold.sfd')
-        for g in reiwa.glyphs():
-            if g.isWorthOutputting:
-                reiwa.selection.select(0x00)
-                reiwa.copy()
-                self.font_jp.selection.select(0x32ff)
-                self.font_jp.paste()
-        reiwa.close()
-
     def slashed_zero(self):
         """半角数字の0をスラッシュゼロにする
         """
@@ -602,10 +615,10 @@ class Cica:
     def modify_m(self, _weight):
         """mの中央の棒を少し短くする
         """
-        m = fontforge.open('./source/m-Regular.sfd')
+        m = fontforge.open(os.path.join(SOURCE, 'm-Regular.sfd'))
         if _weight == 'Bold':
             m.close()
-            m = fontforge.open('./source/m-Bold.sfd')
+            m = fontforge.open(os.path.join(SOURCE, 'm-Bold.sfd'))
         m.selection.select(0x6d)
         m.copy()
         self.font_en.selection.select(0x6d)
@@ -616,7 +629,6 @@ class Cica:
         for g in self.font_en.glyphs():
             if g.encoding == 0x6d:
                 g.anchorPoints = anchorPoints
-
 
     def add_smalltriangle(self):
         """小さいサンカクを追加
@@ -642,10 +654,10 @@ class Cica:
     def reiwa(self, _weight):
         """令和グリフを追加
         """
-        reiwa = fontforge.open('./source/reiwa.sfd')
+        reiwa = fontforge.open(os.path.join(SOURCE, 'reiwa.sfd'))
         if _weight == 'Bold':
             reiwa.close()
-            reiwa = fontforge.open('./source/reiwa-Bold.sfd')
+            reiwa = fontforge.open(os.path.join(SOURCE, 'reiwa-Bold.sfd'))
         for g in reiwa.glyphs():
             if g.isWorthOutputting:
                 reiwa.selection.select(0x00)
@@ -657,7 +669,7 @@ class Cica:
     def import_svg(self):
         """オリジナルのsvgグリフをインポートする
         """
-        files = glob.glob('source/svg/*.svg')
+        files = glob.glob(os.path.join(SOURCE, 'svg/*.svg'))
         for f in files:
             filename, _ = os.path.splitext(os.path.basename(f))
             g = self.font_jp.createChar(int(filename, 16))
@@ -670,7 +682,7 @@ class Cica:
     def add_notoemoji(self):
         """Noto Emojiを足す
         """
-        notoemoji = fontforge.open('./source/NotoEmoji-Regular.ttf')
+        notoemoji = fontforge.open(os.path.join(SOURCE, 'NotoEmoji-Regular.ttf'))
         for g in notoemoji.glyphs():
             if g.isWorthOutputting and g.encoding > 0x04f9:
                 g.transform((0.42,0,0,0.42,0,0))
@@ -684,7 +696,7 @@ class Cica:
     def add_gopher(self):
         """半身Gopherくんを追加
         """
-        gopher = fontforge.open('./source/gopher.sfd')
+        gopher = fontforge.open(os.path.join(SOURCE, 'gopher.sfd'))
         for g in gopher.glyphs():
             if g.isWorthOutputting:
                 gopher.selection.select(0x40)
@@ -911,7 +923,6 @@ class Cica:
 
         if args.modified_m == 0:
             self.modify_m(self.weight_name)
-
         log('transform font_jp')
         for g in self.font_jp.glyphs():
             g.transform((0.91,0,0,0.91,0,0))

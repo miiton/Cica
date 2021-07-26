@@ -87,8 +87,6 @@ let g:NERDTreeExtensionHighlightColor['vue'] = '42B983'
 
 ### Dockerを使う場合
 
-※Regular以外のttfファイルがおかしくなる現象が発生しています #39
-
 ```sh
 git clone https://github.com/miiton/Cica.git
 cd Cica

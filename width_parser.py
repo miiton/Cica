@@ -12,6 +12,8 @@ import re
 #         {0xe0b3: 0},
 # ]
 
+SOURCE = os.getenv('CICA_SOURCE_FONTS_PATH', './sourceFonts')
+
 class WidthParser:
     """グリフの幅をunicode.orgのデータから判定する
 
@@ -49,7 +51,7 @@ class WidthParser:
         """
         pattern = '^([^ ]+) *#.*$'
         regex = re.compile(pattern)
-        data = open("source/EastAsianWidth.txt", "r")
+        data = open(os.path.join(SOURCE, 'EastAsianWidth.txt'), "r")
 
         # 一行ずつ読み込んでは表示する
         for line in data:

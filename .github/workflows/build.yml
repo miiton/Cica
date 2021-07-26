@@ -1,0 +1,23 @@
+name: Build
+
+on: [push]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the source repository to standard location
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      # Build a container in the root of our repository and make it run
+      - name: Execute build
+        uses: ./
+
+      # Upload built results as an artifact
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: Cica-nightly-${{ github.sha }}
+          path: dist
