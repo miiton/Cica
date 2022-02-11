@@ -24,8 +24,8 @@ RUN curl --fail -L https://github.com/source-foundry/Hack/releases/download/$HAC
     unar /tmp/dejavu.zip -o /tmp && \
     cp /tmp/dejavu-fonts-ttf-$DEJAVU_VERSION/ttf/DejaVuSansMono.ttf sourceFonts/ && \
     cp /tmp/dejavu-fonts-ttf-$DEJAVU_VERSION/ttf/DejaVuSansMono-Bold.ttf sourceFonts/ && \
-    curl -L https://github.com/mirmat/iconsfordevs/raw/$ICONSFORDEVS_VERSION/fonts/iconsfordevs.ttf -o sourceFonts/iconsfordevs.ttf && \
-    curl -L http://www.unicode.org/Public/12.0.0/ucd/EastAsianWidth.txt -o sourceFonts/EastAsianWidth.txt
+    curl --fail -L https://github.com/mirmat/iconsfordevs/raw/$ICONSFORDEVS_VERSION/fonts/iconsfordevs.ttf -o sourceFonts/iconsfordevs.ttf
+    curl --fail -L http://www.unicode.org/Public/12.0.0/ucd/EastAsianWidth.txt -o sourceFonts/EastAsianWidth.txt
 
 COPY cica.py cica.py
 COPY width_parser.py width_parser.py
