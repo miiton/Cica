@@ -1,5 +1,6 @@
 tmp/*
 sourceFonts/*
+!sourceFonts/svg
 Cica/*
 .DS_Store
 *.orig
