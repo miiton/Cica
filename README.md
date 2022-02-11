@@ -115,7 +115,7 @@ curl -LO https://osdn.jp/downloads/users/8/8598/rounded-mgenplus-20150602.7z
 unar rounded-mgenplus-20150602.7z
 cp rounded-mgenplus-20150602/rounded-mgenplus-1m-regular.ttf ./sourceFonts
 cp rounded-mgenplus-20150602/rounded-mgenplus-1m-bold.ttf ./sourceFonts
-curl -L https://github.com/googlei18n/noto-emoji/raw/master/fonts/NotoEmoji-Regular.ttf -o sourceFonts/NotoEmoji-Regular.ttf
+curl -L https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoEmoji-Regular.ttf -o sourceFonts/NotoEmoji-Regular.ttf
 curl -LO http://sourceforge.net/projects/dejavu/files/dejavu/2.37/dejavu-fonts-ttf-2.37.zip
 unar dejavu-fonts-ttf-2.37.zip
 mv dejavu-fonts-ttf-2.37/ttf/DejaVuSansMono.ttf ./sourceFonts/
