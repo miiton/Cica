@@ -409,14 +409,6 @@ def vertical_line_to_broken_bar(_f):
     _f.paste()
     return _f
 
-def emdash_to_broken_dash(_f):
-    _f.selection.select(0x006c)
-    _f.copy()
-    _f.selection.select(0x2014)
-    _f.pasteInto()
-    _f.intersect()
-    return _f
-
 def mathglyph_to_double(_f):
     pass
 
@@ -565,7 +557,16 @@ def fix_overflow(glyph):
 def import_svg(font):
     """オリジナルのsvgグリフをインポートする
     """
-    files = glob.glob(os.path.join(SOURCE, 'svg/*.svg'))
+    files = glob.glob(os.path.join(SOURCE, 'svg/single/*.svg'))
+    for f in files:
+        filename, _ = os.path.splitext(os.path.basename(f))
+        g = font.createChar(int(filename, 16))
+        g.clear()
+        g.importOutlines(f)
+        g.width = 512
+        g.vwidth = 512
+
+    files = glob.glob(os.path.join(SOURCE, 'svg/double/*.svg'))
     for f in files:
         filename, _ = os.path.splitext(os.path.basename(f))
         g = font.createChar(int(filename, 16))
@@ -684,7 +685,6 @@ def build_font(_f, emoji):
     cica = zero(cica)
     cica = modify_WM(cica)
     cica = vertical_line_to_broken_bar(cica)
-    cica = emdash_to_broken_dash(cica)
     cica = reiwa(cica, _f.get('weight_name'))
     cica = add_gopher(cica)
     cica = modify_ellipsis(cica)

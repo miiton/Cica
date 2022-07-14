@@ -1,14 +1,15 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ENV HACK_VERSION v3.003
 ENV MGENPLUS_VERSION 20150602
 ENV DEJAVU_VERSION 2.37
 ENV ICONSFORDEVS_VERSION master
 ENV CICA_SOURCE_FONTS_PATH /work/sourceFonts
+ENV LANG ja_JP.UTF-8
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install \
-    software-properties-common fontforge unar git curl && \
+    software-properties-common fontforge unar git curl language-pack-ja && \
     mkdir /work
 WORKDIR /work
 COPY sourceFonts sourceFonts
