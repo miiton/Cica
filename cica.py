@@ -13,8 +13,8 @@ from datetime import datetime
 ASCENT = 820
 DESCENT = 204
 SOURCE = os.getenv('CICA_SOURCE_FONTS_PATH', './sourceFonts')
-LICENSE = open('./LICENSE.txt').read()
-COPYRIGHT = open('./COPYRIGHT.txt').read()
+LICENSE = open('./LICENSE.txt', encoding='utf-8').read()
+COPYRIGHT = open('./COPYRIGHT.txt', encoding='utf-8').read()
 VERSION = '5.0.3'
 FAMILY = 'Cica'
 
@@ -147,7 +147,7 @@ def align_to_center(_g):
         width = 512
 
     _g.width = width
-    _g.left_side_bearing = _g.right_side_bearing = (_g.left_side_bearing + _g.right_side_bearing)/2
+    _g.left_side_bearing = _g.right_side_bearing = int(round((_g.left_side_bearing + _g.right_side_bearing) / 2))
     _g.width = width
 
     return _g
@@ -161,7 +161,7 @@ def align_to_right(_g):
     width = _g.width
     bb = _g.boundingBox()
     left = width - (bb[2] - bb[0])
-    _g.left_side_bearing = left
+    _g.left_side_bearing = int(round(left))
     _g.width = width
 
 def add_dejavu(_f, conf):
@@ -313,7 +313,7 @@ def modify_nerd(_g):
             if _g.encoding in align_right:
                 bb = _g.boundingBox()
                 left = 1024 - (bb[2] - bb[0])
-                _g.left_side_bearing = left
+                _g.left_side_bearing = int(round(left))
                 _g.width = 1024
             if _g.encoding in align_left:
                 _g.left_side_bearing = 0
@@ -324,7 +324,7 @@ def modify_nerd(_g):
             if _g.encoding in align_right:
                 bb = _g.boundingBox()
                 left = 1024 - (bb[2] - bb[0])
-                _g.left_side_bearing = left
+                _g.left_side_bearing = int(round(left))
                 _g.width = 1024
             if _g.encoding in align_left:
                 _g.left_side_bearing = 0
@@ -335,7 +335,7 @@ def modify_nerd(_g):
             if _g.encoding in align_right:
                 bb = _g.boundingBox()
                 left = 1024 - (bb[2] - bb[0])
-                _g.left_side_bearing = left
+                _g.left_side_bearing = int(round(left))
                 _g.width = 1024
             if _g.encoding in align_left:
                 _g.left_side_bearing = 0
@@ -344,7 +344,7 @@ def modify_nerd(_g):
             if _g.encoding in align_right:
                 bb = _g.boundingBox()
                 left = 1024 - (bb[2] - bb[0])
-                _g.left_side_bearing = left
+                _g.left_side_bearing = int(round(left))
                 _g.width = 1024
             if _g.encoding in align_left:
                 _g.left_side_bearing = 0
@@ -354,7 +354,7 @@ def modify_nerd(_g):
             if _g.encoding in align_right:
                 bb = _g.boundingBox()
                 left = 1024 - (bb[2] - bb[0])
-                _g.left_side_bearing = left
+                _g.left_side_bearing = int(round(left))
                 _g.width = 1024
             if _g.encoding in align_left:
                 _g.left_side_bearing = 0
@@ -363,7 +363,7 @@ def modify_nerd(_g):
             _g.transform(psMat.scale(0.8, 1.0))
             bb = _g.boundingBox()
             left = 1024 - (bb[2] - bb[0])
-            _g.left_side_bearing = left
+            _g.left_side_bearing = int(round(left))
             _g.width = 1024
         if _g.encoding == 0xe0cf:
             _g.transform(psMat.scale(0.9, 1.0))
@@ -379,7 +379,7 @@ def modify_nerd(_g):
             if _g.encoding in align_right:
                 bb = _g.boundingBox()
                 left = 1024 - (bb[2] - bb[0])
-                _g.left_side_bearing = left
+                _g.left_side_bearing = int(round(left))
                 _g.width = 1024
             if _g.encoding in align_left:
                 _g.left_side_bearing = 0
@@ -621,7 +621,7 @@ def build_font(_f, emoji):
         if _f.get('italic'):
             g.transform(psMat.skew(0.25))
             skew_amount = g.font.ascent * 0.91 * 0.25
-            g.width = g.width + skew_amount
+            g.width = g.width + int(round(skew_amount))
             full_half_threshold += skew_amount
         if g.width > full_half_threshold:
             width = 1024
